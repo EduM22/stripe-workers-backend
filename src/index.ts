@@ -1,8 +1,15 @@
 import { Router } from 'itty-router'
 import checkoutRouter from './routers/checkout'
 import customRouter from './routers/custom'
+import { corsHeaders } from './utils'
 
 const router = Router()
+
+router.options('*', () => {
+  return new Response('', {
+    headers: corsHeaders
+  })
+})
 
 router.all('/checkout/*', checkoutRouter.handle)
 router.all('/custom/*', customRouter.handle)

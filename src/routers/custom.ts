@@ -1,6 +1,6 @@
 import { Router } from 'itty-router'
 import { Stripe } from 'stripe-workers'
-import { toJSON } from '../utils'
+import { corsHeaders, toJSON } from '../utils'
 
 const router = Router({ base: '/custom' })
 
@@ -9,6 +9,8 @@ const stripe = new Stripe(STRIPE_SECRET_KEY)
 router.get('/config', (req) => {
   return toJSON({
     publishableKey: STRIPE_PUBLISHABLE_KEY,
+  }, {
+    headers: corsHeaders
   })
 })
 
@@ -53,6 +55,8 @@ router.post('/create-payment-intent', async (req) => {
     // Send publishable key and PaymentIntent details to client
     return toJSON({
       clientSecret: paymentIntent.client_secret,
+    }, {
+      headers: corsHeaders
     })
   } catch (e) {
     return toJSON(

@@ -1,6 +1,6 @@
 import { Router } from 'itty-router'
 import { Stripe } from 'stripe-workers'
-import { toJSON } from '../utils'
+import { corsHeaders, toJSON } from '../utils'
 
 const router = Router({ base: '/checkout' })
 
@@ -11,6 +11,8 @@ router.get('/config', () => {
     publishableKey: STRIPE_PUBLISHABLE_KEY,
     unitAmount: 1999,
     currency: 'usd',
+  }, {
+    headers: corsHeaders
   })
 })
 
@@ -18,11 +20,9 @@ router.get('/checkout-session', async (req) => {
   //@ts-expect-error
   const { sessionId } = req.query
 
-  console.log(sessionId)
-
-  //const session = await stripe.checkout.sessions.retrieve(sessionId);
-  return toJSON({
-    id: 'hello',
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  return toJSON(session, {
+    headers: corsHeaders
   })
 })
 
@@ -46,6 +46,8 @@ router.post('/create-checkout-session', async (req) => {
 
   return toJSON({
     sessionId: session.id,
+  }, {
+    headers: corsHeaders
   })
 })
 
