@@ -19,38 +19,66 @@ router.get('/config', () => {
 })
 
 router.get('/checkout-session', async (req) => {
-  //@ts-expect-error
-  const { sessionId } = req.query
-
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
-  return toJSON(session, {
-    headers: corsHeaders
-  })
+  try {
+    //@ts-expect-error
+    const { sessionId } = req.query
+  
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    return toJSON(session, {
+      headers: corsHeaders
+    })
+  } catch (e) {
+    return toJSON(
+      {
+        error: {
+          message: e.message,
+        },
+      },
+      { 
+        status: 400,
+        headers: corsHeaders
+      },
+    )
+  }
 })
 
 router.post('/create-checkout-session', async (req) => {
-  // Create new Checkout Session for the order
-  // Other optional params include:
-  // For full details see https://stripe.com/docs/api/checkout/sessions/create
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card', 'aaa'],
-    mode: 'payment',
-    line_items: [
+  try {
+    // Create new Checkout Session for the order
+    // Other optional params include:
+    // For full details see https://stripe.com/docs/api/checkout/sessions/create
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          amount: 1999,
+          quantity: 1,
+        },
+      ],
+      // ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
+      success_url: `${DOMAIN}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${DOMAIN}/canceled.html`,
+    })
+  
+    return toJSON({
+      sessionId: session.id,
+    }, {
+      headers: corsHeaders
+    })
+  } catch (e) {
+    return toJSON(
       {
-        amount: 1999,
-        quantity: 1,
+        error: {
+          message: e.message,
+        },
       },
-    ],
-    // ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
-    success_url: `${DOMAIN}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${DOMAIN}/canceled.html`,
-  })
-
-  return toJSON({
-    sessionId: session.id,
-  }, {
-    headers: corsHeaders
-  })
+      { 
+        status: 400,
+        headers: corsHeaders
+      },
+    )
+  }
 })
 
 export default router
