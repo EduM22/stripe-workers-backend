@@ -1,12 +1,14 @@
 type = "javascript"
-zone_id = ""
-account_id = ""
-route = ""
-workers_dev = true
-webpack_config = "webpack.config.js"
+zone_id = CF_ZONE_ID
+account_id = CF_ACCOUNT_ID
 name = "stripe-workers-backend"
+workers_dev = true
 
 [build]
 command = "npm install && npm run build"
 [build.upload]
 format = "service-worker"
+
+[env.production]
+workers_dev=false
+route = "api.stripe-demo.to.rnqvist.com/*"
