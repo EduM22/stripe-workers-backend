@@ -4,11 +4,13 @@ import { corsHeaders, toJSON } from '../utils'
 
 const router = Router({ base: '/custom' })
 
-const stripe = new Stripe(STRIPE_SECRET_KEY)
+//@ts-expect-error
+const stripe = new Stripe(globalThis.STRIPE_SECRET_KEY)
 
 router.get('/config', (req) => {
   return toJSON({
-    publishableKey: STRIPE_PUBLISHABLE_KEY,
+    //@ts-expect-error
+    publishableKey: globalThis.STRIPE_PUBLISHABLE_KEY,
   }, {
     headers: corsHeaders
   })
