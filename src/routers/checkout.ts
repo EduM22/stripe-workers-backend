@@ -54,6 +54,7 @@ router.post('/create-checkout-session', async (req) => {
         {
           amount: 1999,
           quantity: 1,
+          currency: 'usd'
         },
       ],
       // ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
