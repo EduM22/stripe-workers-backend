@@ -11,4 +11,4 @@ format = "service-worker"
 
 [env.production]
 workers_dev=false
-route = "api.stripe-demo.to.rnqvist.com/*"
+route = "api-stripe-demo.rnqvist.com/*"

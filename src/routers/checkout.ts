@@ -8,7 +8,7 @@ const router = Router({ base: '/checkout' })
 const stripe = new Stripe(globalThis.STRIPE_SECRET_KEY)
 
 router.get('/config', () => {
-  toJSON({
+  return toJSON({
     //@ts-expect-error
     publishableKey: globalThis.STRIPE_PUBLISHABLE_KEY,
     unitAmount: 1999,

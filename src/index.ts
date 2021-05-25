@@ -14,7 +14,10 @@ router.options('*', () => {
 router.all('/checkout/*', checkoutRouter.handle)
 router.all('/custom/*', customRouter.handle)
 
-router.all('*', () => new Response('Not Found.', { status: 404 }))
+router.all('*', () => new Response('Not Found.', { 
+  status: 404,
+  headers: corsHeaders
+}))
 
 addEventListener('fetch', (event) =>
   event.respondWith(router.handle(event.request)),

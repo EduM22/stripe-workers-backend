@@ -67,7 +67,10 @@ router.post('/create-payment-intent', async (req) => {
           message: e.message,
         },
       },
-      { status: 400 },
+      { 
+        status: 400,
+        headers: corsHeaders
+      },
     )
   }
 })
