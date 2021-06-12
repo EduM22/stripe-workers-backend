@@ -38,6 +38,7 @@ export async function createSession(): Promise<CheckoutSessionsResponse> {
 }
 
 export async function createPaymentIntent(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
   params: any,
 ): Promise<PaymentIntentsResponse> {
   return stripe.paymentIntents.create(params)
