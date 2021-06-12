@@ -7,17 +7,21 @@ const router = Router()
 
 router.options('*', () => {
   return new Response('', {
-    headers: corsHeaders
+    headers: corsHeaders,
   })
 })
 
 router.all('/checkout/*', checkoutRouter.handle)
 router.all('/custom/*', customRouter.handle)
 
-router.all('*', () => new Response('Not Found.', { 
-  status: 404,
-  headers: corsHeaders
-}))
+router.all(
+  '*',
+  () =>
+    new Response('Not Found.', {
+      status: 404,
+      headers: corsHeaders,
+    }),
+)
 
 addEventListener('fetch', (event) =>
   event.respondWith(router.handle(event.request)),

@@ -1,24 +1,24 @@
 import { Router } from 'itty-router'
-import { Stripe } from 'stripe-workers'
 import { corsHeaders, toJSON } from '../utils'
+import { createPaymentIntent } from '../services/stripe'
 
 const router = Router({ base: '/custom' })
 
-//@ts-expect-error
-const stripe = new Stripe(globalThis.STRIPE_SECRET_KEY)
-
-router.get('/config', (req) => {
-  return toJSON({
-    //@ts-expect-error
-    publishableKey: globalThis.STRIPE_PUBLISHABLE_KEY,
-  }, {
-    headers: corsHeaders
-  })
+router.get('/config', () => {
+  return toJSON(
+    {
+      //@ts-expect-error secret not shown
+      publishableKey: globalThis.STRIPE_PUBLISHABLE_KEY,
+    },
+    {
+      headers: corsHeaders,
+    },
+  )
 })
 
 router.post('/create-payment-intent', async (req) => {
   try {
-    //@ts-expect-error
+    //@ts-expect-error .json() not on req
     const { paymentMethodType, currency } = await req.json()
 
     // Each payment method type has support for different currencies. In order to
@@ -36,7 +36,7 @@ router.post('/create-payment-intent', async (req) => {
     // If this is for an ACSS payment, we add payment_method_options to create
     // the Mandate.
     if (paymentMethodType === 'acss_debit') {
-      //@ts-expect-error
+      //@ts-expect-error ts no like assign
       params.payment_method_options = {
         acss_debit: {
           mandate_options: {
@@ -47,19 +47,17 @@ router.post('/create-payment-intent', async (req) => {
       }
     }
 
-    // Create a PaymentIntent with the amount, currency, and a payment method type.
-    //
-    // See the documentation [0] for the full list of supported parameters.
-    //
-    // [0] https://stripe.com/docs/api/payment_intents/create
-    const paymentIntent = await stripe.paymentIntents.create(params)
+    const paymentIntent = await createPaymentIntent(params)
 
     // Send publishable key and PaymentIntent details to client
-    return toJSON({
-      clientSecret: paymentIntent.client_secret,
-    }, {
-      headers: corsHeaders
-    })
+    return toJSON(
+      {
+        clientSecret: paymentIntent.client_secret,
+      },
+      {
+        headers: corsHeaders,
+      },
+    )
   } catch (e) {
     return toJSON(
       {
@@ -67,9 +65,9 @@ router.post('/create-payment-intent', async (req) => {
           message: e.message,
         },
       },
-      { 
+      {
         status: 400,
-        headers: corsHeaders
+        headers: corsHeaders,
       },
     )
   }
