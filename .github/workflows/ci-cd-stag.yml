@@ -1,9 +1,9 @@
-name: Deploy
+name: Deploy staging
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    branches: 
+     - main
 
 jobs:
   test:
@@ -28,7 +28,7 @@ jobs:
         uses: cloudflare/wrangler-action@1.2.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
-          environment: 'production'
+          environment: 'staging'
           wranglerVersion: '1.16.1'
           secrets: |
             STRIPE_SECRET_KEY

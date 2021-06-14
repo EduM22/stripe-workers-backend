@@ -9,6 +9,10 @@ command = "npm install && npm run build"
 [build.upload]
 format = "service-worker"
 
+[env.staging]
+workers_dev=true
+account_id=""
+
 [env.production]
 workers_dev=false
 route = "api-stripe-demo.rnqvist.com/*"
