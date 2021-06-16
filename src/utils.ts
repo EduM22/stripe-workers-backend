@@ -19,8 +19,17 @@ export const checkOrigin = (request: Request) : string => {
 }
 
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const corsHeaders = (origin: string) => ({
   'Access-Control-Allow-Headers': '*',
   'Access-Control-Allow-Methods': 'GET, POST',
   'Access-Control-Allow-Origin': origin
 })
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const requireGlobalSecrets = () => {
+  //@ts-expect-error secret not shown
+  if (!globalThis.STRIPE_PUBLISHABLE_KEY || !globalThis.DOMAIN || !globalThis.STRIPE_SECRET_KEY) {
+    return new Response('Secrets not defined', { status: 500 })
+  }
+}
