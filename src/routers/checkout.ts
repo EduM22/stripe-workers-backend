@@ -1,11 +1,13 @@
 import { Router } from 'itty-router'
-import { corsHeaders, toJSON } from '../utils'
+import { checkOrigin, corsHeaders, toJSON } from '../utils'
 
 import { createSession, getSession } from '../services/stripe'
 
 const router = Router({ base: '/checkout' })
 
-router.get('/config', () => {
+router.get('/config', (req) => {
+  // @ts-expect-error error on req
+  const allowedOrigin = checkOrigin(req)
   return toJSON(
     {
       //@ts-expect-error secret not shown
@@ -14,19 +16,21 @@ router.get('/config', () => {
       currency: 'usd',
     },
     {
-      headers: corsHeaders,
+      headers: corsHeaders(allowedOrigin),
     },
   )
 })
 
 router.get('/checkout-session', async (req) => {
+  // @ts-expect-error error on req
+  const allowedOrigin = checkOrigin(req)
   try {
     //@ts-expect-error sessionId not found on query obj
     const { sessionId } = req.query
 
     const session = await getSession(sessionId)
     return toJSON(session, {
-      headers: corsHeaders,
+      headers: corsHeaders(allowedOrigin),
     })
   } catch (e) {
     return toJSON(
@@ -37,13 +41,15 @@ router.get('/checkout-session', async (req) => {
       },
       {
         status: 400,
-        headers: corsHeaders,
+        headers: corsHeaders(allowedOrigin),
       },
     )
   }
 })
 
-router.post('/create-checkout-session', async () => {
+router.post('/create-checkout-session', async (req) => {
+  // @ts-expect-error error on req
+  const allowedOrigin = checkOrigin(req)
   try {
     const { id } = await createSession()
 
@@ -52,7 +58,7 @@ router.post('/create-checkout-session', async () => {
         sessionId: id,
       },
       {
-        headers: corsHeaders,
+        headers: corsHeaders(allowedOrigin),
       },
     )
   } catch (e) {
@@ -65,7 +71,7 @@ router.post('/create-checkout-session', async () => {
       },
       {
         status: 400,
-        headers: corsHeaders,
+        headers: corsHeaders(allowedOrigin),
       },
     )
   }

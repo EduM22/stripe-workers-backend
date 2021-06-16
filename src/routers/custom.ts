@@ -1,22 +1,26 @@
 import { Router } from 'itty-router'
-import { corsHeaders, toJSON } from '../utils'
+import { checkOrigin, corsHeaders, toJSON } from '../utils'
 import { createPaymentIntent } from '../services/stripe'
 
 const router = Router({ base: '/custom' })
 
-router.get('/config', () => {
+router.get('/config', (req) => {
+  // @ts-expect-error error on req
+  const allowedOrigin = checkOrigin(req)
   return toJSON(
     {
       //@ts-expect-error secret not shown
       publishableKey: globalThis.STRIPE_PUBLISHABLE_KEY,
     },
     {
-      headers: corsHeaders,
+      headers: corsHeaders(allowedOrigin),
     },
   )
 })
 
 router.post('/create-payment-intent', async (req) => {
+  // @ts-expect-error error on req
+  const allowedOrigin = checkOrigin(req)
   try {
     //@ts-expect-error .json() not on req
     const { paymentMethodType, currency } = await req.json()
@@ -55,7 +59,7 @@ router.post('/create-payment-intent', async (req) => {
         clientSecret: paymentIntent.client_secret,
       },
       {
-        headers: corsHeaders,
+        headers: corsHeaders(allowedOrigin),
       },
     )
   } catch (e) {
@@ -67,7 +71,7 @@ router.post('/create-payment-intent', async (req) => {
       },
       {
         status: 400,
-        headers: corsHeaders,
+        headers: corsHeaders(allowedOrigin),
       },
     )
   }
